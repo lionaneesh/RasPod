@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RasPod</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/static/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <style>
+    .btn.large.BB, .btn.btn-primary.BB {
+        height: 50px;
+        width: 60px;
+    }
+    #now_playing, #message {
+        background: #E0FFC9;
+        border: 1px solid #7BB37B;
+        float: right;
+        position: absolute;
+        right: 10px;
+    }
+
+    #seek_pos {
+        float: right;
+    }
+
+	#slider {
+		margin: 10px;
+        width: 100px;
+	}
+	
+	#seek_slider {
+		margin: 10px;
+	}
+
+    </style>
+  </head>
+  <body>
+      <div id='now_playing' style='top: 10px;'></div>
+      <div id='message' style='top: 40px;'><b>Playlist :</b> <i>{{playl}}</i></div>
+    <div class="container">
+        <img style="float: left; padding: 5px;" src="/static/images/glyphicons_017_music.png"> <img style="float: left; padding: 5px;" src="/static/images/glyphicons_397_rss.png">
+        <h1>RasPod</h1>
+        <div class='hero-unit'>
+        <center>
+        <div id='seek_slider'></div><p id='seek_pos'></p>
+         <div style="width: 240px; padding: 0; margin: 0;" class="btn-grp">
+                  <button id="prev" class="btn large BB"><img src='/static/images/glyphicons_210_left_arrow.png'></button>
+                  <button id="play_pause" class="btn btn-primary BB"><img src='/static/images/glyphicons_173_play.png'></button>
+                  <button id="stop" class="btn btn-primary BB"><img src='/static/images/glyphicons_175_stop.png'></button>
+                  <button id="next" class="btn large BB"><img src='/static/images/glyphicons_211_right_arrow.png'></button>
+          </div>
+		<div id="slider"></div>
+     </div>
+     </center>
+      <div class="row">
+        <div class="span4">
+          <table id="song_list" class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Track</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for index, path in enumerate(media_files) %}
+              <tr>
+                <td>{{index}}</td>
+                <td><a id="jump-{{index}}" class="{{index}}">{{ escape(path) }}</a></td>
+              </tr>
+              {% end %}
+            </tbody>
+          </table>
+        </div>
+        <div class='span4' style="background: #E0FFC9; padding: 20px; border: 1px solid #7BB37B; float: right;">
+            <ul class="unstyled">
+                <li><button class="btn"><img style="width: 16px;" src='/static/images/glyphicons_018_note.png'> <a href="/create_new_playlist">Create New Playlist</a> </button></li>
+                {% for playlist in playlists %}
+                    <li style="padding: 2px;"><a href='/{{ url_escape(playlist) }}'>{{playlist}}</a> | <a href="/playlists/{{ url_escape(playlist) }}/delete">Delete</a></li>
+                {% end %}
+            </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Javascript, Added at the end so that pages load faster !-->
+    <script type="text/javascript" src='/static/js/jquery.min.js'></script>
+    <script type="text/javascript" src='/static/js/bootstrap-button.js'></script>
+	<script type="text/javascript" src='/static/js/jquery-ui.js'></script>
+	<script type="text/javascript">
+	var seekBarLength   = 1;
+	var seekBarPosition = 1;    // update in whenever the seek bar is updated
+    var seekIncTimerId  = null; // To track the increment timer id
+    setSeekSlider();
+    setVolumeSlider();
+    nowPlaying();
+    
+    // Check now_playing in every 7 seconds
+    setInterval("nowPlaying()", 7000);
+    
+    function nowPlaying() {
+        $.get('/player/get_current_track',
+        function(data) {
+            if (data != 'None') {
+                $('#now_playing').html('<b>Now Playing</b> : <i>' + data + '</i>')
+                if (seekIncTimerId == null) {
+                    seekIncTimerId = setInterval("incrementSeekPosition()", 1000);
+                    setPlaying()
+                }
+
+                // We are gonna update the seekbar now
+                setSeekBarLength()
+                setSeekBarPosition()
+                updateSeekBarPosition()
+            } else {
+                $('#now_playing').html('')
+                setPaused();
+                clearInterval(seekIncTimerId);
+                seekIncTimerId  = null;
+                seekBarPosition = 0;
+                updateSeekBarPosition();
+            }
+        })
+        .error(function() {
+            $('#now_playing').html('')
+            setPaused()
+            clearInterval(seekIncTimerId);
+            seekIncTimerId = null;
+        })
+    }
+    
+    function updateSeekBarPosition() {
+        $('#seek_slider').slider('value', seekBarPosition);
+        $('#seek_pos').html(seekBarPosition + ' seconds');
+    }
+    
+    function setSeek(pos) {
+            $.get('/set_seek/' + pos)
+            .error (function () {
+                alert('Failed to seek');
+            })
+            .success (function () {
+              seekBarPosition = parseInt(pos);
+              updateSeekBarPosition();  
+            })
+    }
+    
+    function setSeekBarPosition() {
+        $.get('/player/get_time', function(data) {
+            seekBarPosition = parseInt(data);
+        })
+        .error ( function () {
+            nowPlaying();
+        });
+    }
+    
+    function setSeekBarLength() {
+        $.get('/player/get_length', function(data) {
+            if (data != seekBarLength) {
+                seekBarLength   = parseInt(data)
+                setSeekSlider()
+            }
+        })
+        .error ( function () {
+            nowPlaying();
+        });
+    }
+    
+    function incrementSeekPosition() {
+        if (seekBarPosition < seekBarLength)
+            seekBarPosition++;        
+        
+        else
+            nowPlaying();
+
+        updateSeekBarPosition();
+    }
+    
+    function setPlaying() {
+        $("#play_pause").html('<img src=\'/static/images/glyphicons_174_pause.png\'>')
+    }
+    function setPaused() {
+        $("#play_pause").html('<img src=\'/static/images/glyphicons_173_play.png\'>')
+
+    }
+	function setVolume(volume) {
+		$.get('/set_volume/' + volume);
+	}
+	
+	function setVolumeSlider() {
+		$.get('/player/get_vol',
+		function (data) {
+			$("#slider").slider({
+				min: 0,
+				max: 100,
+				value: data,
+				step: 5,
+				slide: function(event, ui) { setVolume(ui.value); }
+			});
+		}
+		);
+	}
+
+    function setSeekSlider() {
+		$("#seek_slider").slider({
+				min: 1,
+				max: seekBarLength,
+				value: seekBarPosition,
+				step: 1,
+				change: function(event, ui) {
+				    if (event.originalEvent != undefined)
+			            setSeek(ui.value);
+			        }
+			});
+	}
+	
+    $("#play_pause").click(function() {
+        $.get('/player/play_pause');
+        nowPlaying()
+    });
+    
+    $("#stop").click(function() {
+        $.get('/player/stop')
+        nowPlaying()
+    });
+    
+    $("#prev").click(function() {
+        $.get('/player/prev')
+        nowPlaying()
+    });
+    
+    $("#next").click(function() {
+        $.get('/player/next')
+        nowPlaying()
+    });
+    $('a[id|="jump"]').click(function(){
+        $.get('/jump_to/'+$(this).attr('class'))
+        nowPlaying()
+    });
+  </script>
+  </body>
+</html>
