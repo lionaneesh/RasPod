@@ -64,6 +64,11 @@ Tested On
 - Debian Wheezy
 - Debian Squeeze
 
+Setting Up RasPod
+=================
+
+Please check the wiki (https://github.com/lionaneesh/RasPod/wiki/Setting-up-RasPod) we created for thus purpose.
+
 Developers
 ==========
 
