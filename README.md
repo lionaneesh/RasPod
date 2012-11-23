@@ -67,7 +67,7 @@ Tested On
 Setting Up RasPod
 =================
 
-Please check the wiki (https://github.com/lionaneesh/RasPod/wiki/Setting-up-RasPod) we created for thus purpose.
+Please check the wiki (https://github.com/lionaneesh/RasPod/wiki/Setting-up-RasPod) we created for this purpose.
 
 Developers
 ==========
