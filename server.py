@@ -229,7 +229,7 @@ class Media():
         """Finds the files with extension .mp3 from the media folder
         defined in settings.py"""
         media_files = []
-        for dirpath, dirs, files in os.walk(settings.MEDIA_FOLDER):
+        for dirpath, dirs, files in os.walk(settings.MEDIA_FOLDER, followlinks=True):
             for filename in files:
                 if os.path.splitext(filename)[-1] == ".mp3":
                     media_files.append(
