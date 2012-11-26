@@ -119,9 +119,9 @@ class RasPod():
         self.media_files = playlists[self.playlist]
         vlc.libvlc_media_list_lock(self.MediaPlayer_list)
         for i in range(0, len(self.media_files)):
-            filename = unicode(settings.MEDIA_FOLDER) + self.media_files[i]
+            filename = unicode(settings.MEDIA_FOLDER, 'utf-8') + unicode(self.media_files[i], 'utf-8')
             if os.access(filename, os.R_OK):
-                self.MediaPlayer_list.insert_media(self.Instance.media_new(filename), i)
+                self.MediaPlayer_list.insert_media(self.Instance.media_new(filename.encode('utf-8', 'ignore')), i)
             else:
                 print("%s is not readable.")
         vlc.libvlc_media_list_unlock(self.MediaPlayer_list)
