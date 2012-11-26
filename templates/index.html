@@ -4,6 +4,7 @@
     <title>RasPod</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
 	<link href="/static/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/table.css" rel='stylesheet'>
     <style>
     .btn.large.BB, .btn.btn-primary.BB {
         height: 50px;
@@ -51,12 +52,13 @@
      </div>
      </center>
       <div class="row">
-        <div class="span4">
-          <table id="song_list" class="table">
+        <div class="span6">
+          <div class="dataTables_wrapper">
+          <table id="song_list" cellspacing="0" border="0" class="display dataTable" id="example" width="100%" style="width: 100%;">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Track</th>
+                <th class="sorting" role="columnheader" tabindex="0">#</th>
+                <th class="sorting" role="columnheader" tabindex="1">Track</th>
               </tr>
             </thead>
             <tbody>
@@ -68,21 +70,48 @@
               {% end %}
             </tbody>
           </table>
+          </div>
         </div>
-        <div class='span4' style="background: #E0FFC9; padding: 20px; border: 1px solid #7BB37B; float: right;">
-            <ul class="unstyled">
-                <li><button class="btn"><img style="width: 16px;" src='/static/images/glyphicons_018_note.png'> <a href="/create_new_playlist">Create New Playlist</a> </button></li>
-                {% for playlist in playlists %}
-                    <li style="padding: 2px;"><a href='/{{ url_escape(playlist) }}'>{{playlist}}</a> | <a href="/playlists/{{ url_escape(playlist) }}/delete">Delete</a></li>
-                {% end %}
-            </ul>
+        
+        <div class="span6">
+        <a href="/create_new_playlist">Create New Playlist</a> <hr/>
+        {%  if len(playlists) > 0 %}
+        <div class="dataTables_wrapper">
+          <table id="playlist_list" cellspacing="0" border="0" class="display dataTable" id="example" width="100%" style="width: 100%;">
+            <thead>
+              <tr>
+                <th class="sorting" colspan="1" role="columnheader" tabindex="0">Playlist</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for playlist in playlists %}
+              <tr>
+                <td><a href='/{{ url_escape(playlist) }}'>{{playlist}}</a></td>
+                <td><a href="/playlists/{{ url_escape(playlist) }}/delete">Delete</a></td>
+              </tr>
+              {% end %}
+            </tbody>
+          </table>
+          </div>
+        {% end %}
         </div>
       </div>
     </div>
     <!-- Javascript, Added at the end so that pages load faster !-->
     <script type="text/javascript" src='/static/js/jquery.min.js'></script>
+    <script type="text/javascript" src='/static/js/jquery.dataTables.js'></script>
     <script type="text/javascript" src='/static/js/bootstrap-button.js'></script>
 	<script type="text/javascript" src='/static/js/jquery-ui.js'></script>
+	<script type="text/javascript">
+	    $(document).ready(function() {
+				$('#song_list').dataTable();
+		} )
+		
+		$(document).ready(function() {
+				$('#playlist_list').dataTable();
+		} )
+	</script>
 	<script type="text/javascript">
 	var seekBarLength   = 1;
 	var seekBarPosition = 1;    // update in whenever the seek bar is updated
