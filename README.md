@@ -3,6 +3,12 @@ RasPod
 
 A simple music server for Raspberry Pi.
 
+Setting Up RasPod
+=================
+
+Please check the wiki (https://github.com/lionaneesh/RasPod/wiki/Setting-up-RasPod) we created for this purpose.
+The wiki can be edited by any registered Github user, so please help us make it more readable and cover most of the platforms.
+
 Requirements
 ===========
 
@@ -64,10 +70,10 @@ Tested On
 - Debian Wheezy
 - Debian Squeeze
 
-Setting Up RasPod
-=================
+Ideas and Bug Reports
+=====================
 
-Please check the wiki (https://github.com/lionaneesh/RasPod/wiki/Setting-up-RasPod) we created for this purpose.
+Please file your feature requests and bug reports in our issue tracker @ https://github.com/lionaneesh/RasPod/issues .
 
 Developers
 ==========
