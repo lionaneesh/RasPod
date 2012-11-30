@@ -17,7 +17,7 @@ import tornado.template
 import vlc # libVLC
 import settings
 
-def handle_SIGINT(signal, frame) :    
+def handle_SIGINT(signal, frame) :
     print("Ctrl + C, Detected!")
     print("Exiting Gracefully.")
     rasPod.close()
@@ -44,7 +44,7 @@ def add_playlist(name, song_list, c, con):
 def db_get_playlists(c):
     c.execute("SELECT * FROM playlists")
     playlists = {}
-    
+
     while 1:
         try:
             data = list(c.fetchone())
@@ -62,7 +62,7 @@ class RasPod():
         self.ListMediaPlayer = 0
         self.playlist    = playlist
         self.MediaPlayer_list = self.Instance.media_list_new()
-        
+
         if self.MediaPlayer_list == False:
             print "Failed to get media_list object"
             self.close()
@@ -70,7 +70,7 @@ class RasPod():
 
         self._build_up_playlist()
         self._setup_media_players()
-    
+
     def _setup_media_players(self):
         self.MediaPlayer     = self.Instance.media_player_new()
         self.ListMediaPlayer = self.Instance.media_list_player_new()
@@ -84,12 +84,12 @@ class RasPod():
 
     def is_seekable(self):
         return self.MediaPlayer.is_seekable()
-        
+
     #-- Time/Length/Seek Related -- All functions return time in seconds
-    
+
     def get_time(self):
         return int(self.MediaPlayer.get_time() / 1000)
-        
+
     def get_length(self):
         return int(self.MediaPlayer.get_length() / 1000)
 
@@ -100,10 +100,10 @@ class RasPod():
         return self.MediaPlayer != 0
 
     #-- Data Validation --
-    
+
     def _valid_index(self, id):
         return (id >= 0 and id < len(self.media_files))
-    
+
     def _is_valid_volume(self, volume):
         return (volume <= 100 and volume >= 0)
 
@@ -125,25 +125,25 @@ class RasPod():
             else:
                 print("%s is not readable.")
         vlc.libvlc_media_list_unlock(self.MediaPlayer_list)
-    
+
     def load_new_playlist(self, new_playlist):
         self.stop()
         self.close()
         self.__init__(new_playlist)
-    
+
     #-- Track/Track-id related methods --
-            
+
     def _get_current_item_id(self):
         if not self._is_open():
             print 'Not Open!'
             return -1
 
         else:
-            self.current_media = vlc.libvlc_media_player_get_media(self.MediaPlayer)  
-            
+            self.current_media = vlc.libvlc_media_player_get_media(self.MediaPlayer)
+
             if not self.current_media:
                 return -1
-            
+
             return self.MediaPlayer_list.index_of_item(self.current_media)
 
     def play_track_at_id(self, id):
@@ -157,9 +157,9 @@ class RasPod():
         if not self._valid_index(self.item_id):
             return 'None'
         return self.media_files[self.item_id]
-    
+
     #-- Actions
-    
+
     def stop(self):
         """Stop player
         """
@@ -175,13 +175,13 @@ class RasPod():
         else:
             self.ListMediaPlayer.play()
             self.isPaused = False
-        
+
     def prev(self):
         self.ListMediaPlayer.previous()
-    
+
     def next(self):
         self.ListMediaPlayer.next()
-    
+
     def get_volume(self):
         return self.MediaPlayer.audio_get_volume()
 
@@ -192,7 +192,7 @@ class RasPod():
         current_vol = self.get_volume()
         if self._is_valid_volume(current_vol) and current_vol < 100:
             self.set_volume(current_vol + 1)
-    
+
     def vol_down(self):
         current_vol = self.get_volume()
         if self._is_valid_volume(current_vol) and current_vol > 0:
@@ -207,21 +207,21 @@ class RasPod():
         if self.ListMediaPlayer:
             self.ListMediaPlayer.release()
             self.MediaPlayer = 0
-        
+
         if self.MediaPlayer_list:
             self.MediaPlayer_list.release()
             self.MediaPlayer_list = 0
-        
+
         if self.MediaPlayer:
             self.MediaPlayer.release()
             self.MediaPlayer = 0
-        
+
         self.Instance = 0
 
 class Media():
     def __init__(self):
         self.media_f = self.find_media_files()
-    
+
     def get_media_files(self):
         return self.media_f
 
@@ -247,7 +247,7 @@ class PlaylistCreator(tornado.web.RequestHandler):
         media_files = media.get_media_files()
         self.write(
             self.loader.load("playlist_creator.html").generate(error_message='', media_files=media_files))
-    
+
     def post(self):
             params = self.request.body.split('&')
             ids = []
@@ -273,11 +273,11 @@ class PlaylistCreator(tornado.web.RequestHandler):
             for a in ids:
                 if a.isdigit() and int(a) < len(media_files) and int(a) >= 0:
                     song_list.append(media_files[int(a)])
-            
+
             add_playlist(name, song_list, c, con)
             playlists[name] = song_list
             self.redirect('/')
-        
+
 class SeekingHandler(tornado.web.RequestHandler):
     def initialize(self):
         self.loader = tornado.template.Loader(settings.TEMPLATE_FOLDER)
@@ -299,27 +299,27 @@ class PlaylistsEditor(tornado.web.RequestHandler):
     def delete_playlist(self, playlist):
         log   = "Playlist success fully, deteled."
         print "Trying to delete the %s playlist." % (playlist)
-        
-        try: 
+
+        try:
             c.execute("DELETE FROM playlists WHERE name=?", (playlist,))
             con.commit()
-            
+
         except lite.OperationalError:
             log = "Failed to detele the playlist."
-        
+
         else:
             playlists.pop(playlist)
-        
+
         print log
-        
+
         self.redirect("/")
-        
-    
+
+
     def get(self, playlist, action):
         actions = {
             'delete' : self.delete_playlist
         }
-        
+
         if action in actions:
             actions[action](playlist)
 
@@ -354,9 +354,9 @@ class MainHandler(tornado.web.RequestHandler):
             if rasPod.get_current_playlist_name() != playlist:
                 print "Loading %s" % playlist
                 rasPod.load_new_playlist(playlist)
-        
+
         self.write(self.loader.load("index.html").generate(playl=rasPod.get_current_playlist_name(), media_files=rasPod.get_current_playlist(), playlists=playlists))
-# Mapping the "/" url to the MainHandler request handler.
+
 application = tornado.web.Application(
 [
     (r"/player/(.*)", PlayerHandler),
@@ -373,21 +373,21 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, handle_SIGINT)
     port = 8888
     playlists = {}
-    
-    if len(argv) == 2 and argv[1].isdigit() :
+
+    if len(argv) == 2 and argv[1].isdigit():
         port = int(argv[1])
-    
+
     application.listen(port)
-    
+
     # ---- Database Handling -----
-    
+
     c, con = db_connect()
     db_create(c, con)
-    
+
     playlists = db_get_playlists(c)
-    
+
     # -----
-    
+
     media = Media()
     playlists['all'] = media.get_media_files()
     rasPod = RasPod('all')
