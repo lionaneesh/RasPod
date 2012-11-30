@@ -228,6 +228,7 @@ class Media():
     def find_media_files(self):
         """Finds the files with extension .mp3 from the media folder
         defined in settings.py"""
+        print "Finding media files."
         media_files = []
         for dirpath, dirs, files in os.walk(settings.MEDIA_FOLDER, followlinks=True):
             for filename in files:
@@ -344,6 +345,11 @@ class PlayerHandler(tornado.web.RequestHandler):
         if out != None:
             self.write(str(out))
 
+class ResyncMedia(tornado.web.RequestHandler):
+    def get(self):
+        media = Media()
+        self.redirect('/')
+
 class MainHandler(tornado.web.RequestHandler):
 
     def initialize(self):
@@ -360,6 +366,7 @@ class MainHandler(tornado.web.RequestHandler):
 application = tornado.web.Application(
 [
     (r"/player/(.*)", PlayerHandler),
+    (r"/resync", ResyncMedia),
     (r"/jump_to/(.*)", SeekingHandler),
     (r"/create_new_playlist", PlaylistCreator),
     (r"/set_volume/([0-9]{1,3})", SetVolumeHandler),

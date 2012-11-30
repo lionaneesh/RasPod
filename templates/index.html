@@ -52,6 +52,11 @@
      </div>
      </center>
       <div class="row">
+        <div class="span12">
+                <a href="/resync">Resync Songs</a> |
+                <a href="/create_new_playlist">Create New Playlist</a>
+        <hr />
+        </div>
         <div class="span6">
           <div class="dataTables_wrapper">
           <table id="song_list" cellspacing="0" border="0" class="display dataTable" id="example" width="100%" style="width: 100%;">
@@ -74,7 +79,6 @@
         </div>
         
         <div class="span6">
-        <a href="/create_new_playlist">Create New Playlist</a> <hr/>
         {%  if len(playlists) > 0 %}
         <div class="dataTables_wrapper">
           <table id="playlist_list" cellspacing="0" border="0" class="display dataTable" id="example" width="100%" style="width: 100%;">
