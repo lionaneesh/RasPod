@@ -6,17 +6,19 @@ A simple music server for Raspberry Pi.
 Setting Up RasPod
 =================
 
-Please check the wiki (https://github.com/lionaneesh/RasPod/wiki/Setting-up-RasPod) we created for this purpose.
+Please check the [wiki](https://github.com/lionaneesh/RasPod/wiki/Setting-up-RasPod) we created for this purpose.
 The wiki can be edited by any registered Github user, so please help us make it more readable and cover most of the platforms.
 
 Requirements
 ===========
 
-As the project is based on python, you obviously require to have python installed.
+- Python v2.7
+- Tornado server (v1.2 aleast)
+- LibVLC
+- Vlc
+- Alsa-utils
 
-The project has been tested on Python v2.7.
-
-Also tornado server (v1.2 aleast), libVLC, alsa-utils are required.
+Ubuntu Command:
 
 	# sudo apt-get install python-tornado python-setuptools vlc alsa-utils
 
@@ -32,7 +34,7 @@ Raspod uses python-tornado for handling HTTP requests.
 	# sudo apt-get install python-tornado
 
 Note: On Raspberry Pi [debian squeeze] you need to build the tornado server yourself,
-as the latest package availiable is v1.0 [http://packages.debian.org/squeeze/python-tornado]
+as the latest package availiable is [v1.0](http://packages.debian.org/squeeze/python-tornado)
 which would give out some errors.
 
 - Install VLC and Alsa-drivers
@@ -73,9 +75,9 @@ Tested On
 Ideas and Bug Reports
 =====================
 
-Please file your feature requests and bug reports in our issue tracker @ https://github.com/lionaneesh/RasPod/issues .
+Please file your feature requests and bug reports at our [issue tracker](https://github.com/lionaneesh/RasPod/issues).
 
 Developers
 ==========
 
-	Aneesh Dogra (lionaneesh-at-gmail)
+Aneesh Dogra (lionaneesh-at-gmail)
