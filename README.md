@@ -80,4 +80,4 @@ Please file your feature requests and bug reports at our [issue tracker](https:/
 Developers
 ==========
 
-Aneesh Dogra (lionaneesh-at-gmail)
+[Aneesh Dogra](http://anee.me/) (lionaneesh-at-gmail)
